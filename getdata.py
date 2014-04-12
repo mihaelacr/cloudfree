@@ -48,25 +48,31 @@ def getImageData(startDay, nrDays):
   days = [dayDeltaBack(startDay, x) for x in xrange(nrDays)]
   return map(getPhoto, days), map(getCloud, days), map(getNoData, days)
 
-def growMask(mask, up, left):
+def growMask(mask, leftRight, upDown):
   maskBuffer = np.array(mask)
 
-  res = np.roll(maskBuffer,  up, axis=0) # down
-  res[:up,:] = 0
-  maskBuffer |= res
+  # res = np.roll(maskBuffer, -5, axis=1) # right
+  # maskBuffer |= res
 
-  res = np.roll(maskBuffer, -up, axis=0) # up
-  res[-up:,:] = 0
-  maskBuffer |= res
+  for x in xrange(-leftRight, 0):
+    res = np.roll(maskBuffer, x, axis=1) # left
+    res[:, x:] = 0
+    maskBuffer |= res
 
+  for x in xrange(1, leftRight+1):
+    res = np.roll(maskBuffer, x, axis=1) # right
+    res[:, :x] = 0
+    maskBuffer |= res
 
-  res = np.roll(maskBuffer,  left, axis=1) # right
-  res[:, :left] = 0
-  maskBuffer |= res
+  for y in xrange(-upDown, 0):
+    res = np.roll(maskBuffer, y, axis=0) # up
+    res[y:,:] = 0
+    maskBuffer |= res
 
-  res = np.roll(maskBuffer, -left, axis=1) # left
-  res[:, -left:] = 0
-  maskBuffer |= res
+  for y in xrange(0, upDown+1):
+    res = np.roll(maskBuffer, y, axis=0) # down
+    res[:y,:] = 0
+    maskBuffer |= res
 
   return maskBuffer
 
@@ -75,7 +81,7 @@ date = datetime.datetime(year=2013, month=01, day=01)
 getImageData(date, 10)
 
 # The maximum number of days used to get the cloud free images
-maxDays = 10 # TODO: change to 100
+maxDays = 365
 
 # get all the data at once
 photos, clouds, noDatas = getImageData(date, maxDays)
@@ -103,21 +109,25 @@ for i in xrange(maxDays):
   # bigger mask
 
   # print a
-  gapMask = growMask(noDataMask, 40, 0) ^ noDataMask  # 0xff -> gap pixels
+  gapMask = growMask(noDataMask, 2, 4)   # 0xff -> gap pixels
+  aMask = a
+  # aMask = growMask(a, 1, 1)
+
   # print gapMask.shape
   # print type(gapMask[0,0])
-  bla = gapMask.astype(np.uint8)
-  xx = np.array([bla]*3).T
-  print xx.shape
-  print type(xx[0,0,0])
+  # bla = gapMask.astype(np.uint8)
+  bla = aMask.astype(np.uint8)
+  # xx = bla[:, np.newaxis] + np.zeros((512, 512, 3))
+  # print xx.shape
+  # print type(xx[0,0,0])
   # print "xx.tobytes"
   # print xx.tobytes
   # Image.fromarray(xx).save('gap.jpg')
-  Image.fromarray(np.uint8(xx*255)).save('gap.jpg')
+  # Image.fromarray(np.uint8(bla)).save('gap%d.jpg' % i)
 
-  workingBuffer = np.where(((a | noDataMask | gapMask) == 0)[:, :, np.newaxis], rgb, workingBuffer)
-  print workingBuffer.shape
-  print type(workingBuffer[0,0,0])
+  workingBuffer = np.where(((a | aMask | gapMask) == 0)[:, :, np.newaxis], rgb, workingBuffer)
+  # print workingBuffer.shape
+  # print type(workingBuffer[0,0,0])
 
   # save output
   fileName = "output/output-"+dayDeltaBack(date, i) + ".jpg"

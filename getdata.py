@@ -24,7 +24,7 @@ def getPhoto(day, zoom, tile):
   fileName = os.path.join(DATADIR, day) +"-photo.jpg"
 
   if not os.path.isfile(fileName):
-    content = urllib.urlopen("http://map1.vis.earthdata.nasa.gov/wmts-geo/MODIS_Terra_CorrectedReflectance_TrueColor/default/" + day + "/EPSG4326_250m/"+ + zoom + tile + ".jpg").read()
+    content = urllib.urlopen("http://map1.vis.earthdata.nasa.gov/wmts-geo/MODIS_Terra_CorrectedReflectance_TrueColor/default/" + day + "/EPSG4326_250m/"+ zoom + tile + ".jpg").read()
     with open(fileName, "wb") as f:
       f.write(content)
 

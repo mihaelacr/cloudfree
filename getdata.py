@@ -13,7 +13,7 @@ import os.path
 
 DATADIR = "data"
 OUTPUTDIR = "output"
-MAXDAYS = 10
+MAXDAYS = 100
 
 if not os.path.exists(DATADIR):
   os.makedirs(DATADIR)
@@ -26,7 +26,7 @@ def dayDeltaBack(day, delta):
 
 def getPhoto(day, zoom, tile):
   zoom = str(zoom)
-  fileName = os.path.join(DATADIR, day) +"-" + zoom + "-" + str(tile[0]) + str(tile[1]) + " photo.jpg"
+  fileName = os.path.join(DATADIR, day) +"-" + zoom + "-" + str(tile[0]) + str(tile[1]) + "photo.jpg"
   tile = "/" + str(tile[0]) + "/" + str(tile[1])
 
   if not os.path.isfile(fileName):
@@ -38,11 +38,12 @@ def getPhoto(day, zoom, tile):
 
 def getCloud(day, zoom, tile):
   zoom = str(zoom)
-  fileName = os.path.join(DATADIR, day) +"-" + zoom + "-" + str(tile[0]) + str(tile[1]) + " photo.jpg"
+  fileName = os.path.join(DATADIR, day) +"-" + zoom + "-" + str(tile[0]) + str(tile[1]) + "cloud.png"
   tile = "/" + str(tile[0]) + "/" + str(tile[1])
 
   if not os.path.isfile(fileName):
-    content = urllib.urlopen("http://map1.vis.earthdata.nasa.gov/wmts-geo/MODIS_Terra_Cloud_Top_Temp_Day/default/" + day + "/EPSG4326_2km/"+ zoom + tile + ".png").read()
+    url = "http://map1.vis.earthdata.nasa.gov/wmts-geo/MODIS_Terra_Cloud_Top_Temp_Day/default/" + day + "/EPSG4326_2km/"+ zoom + tile + ".png"
+    content = urllib.urlopen(url).read()
     with open(fileName, "wb") as f:
       f.write(content)
 
@@ -50,7 +51,7 @@ def getCloud(day, zoom, tile):
 
 def getNoData(day, zoom, tile):
   zoom = str(zoom)
-  fileName = os.path.join(DATADIR, day) +"-" + zoom + "-" + str(tile[0]) + str(tile[1]) + " photo.jpg"
+  fileName = os.path.join(DATADIR, day) +"-" + zoom + "-" + str(tile[0]) + str(tile[1]) + "nodata.png"
   tile = "/" + str(tile[0]) + "/" + str(tile[1])
 
   if not os.path.isfile(fileName):
@@ -106,7 +107,7 @@ def growMask(mask, leftRight, upDown):
 def getData(tile, date, zoom):
   # get all the data at once
   photos, clouds, noDatas = getImageData(date, MAXDAYS, zoom, tile)
-
+  print tile
   workingBuffer = np.zeros(shape=(512, 512, 3), dtype=np.uint8)
 
   for i in xrange(MAXDAYS):
@@ -150,13 +151,27 @@ def getData(tile, date, zoom):
     # print type(workingBuffer[0,0,0])
 
     # save output
-    fileName = OUTPUTDIR + "/output-"+dayDeltaBack(date, i) + ".jpg"
+    fileName = os.path.join(OUTPUTDIR, "output") + "-" + dayDeltaBack(date, i) + "-" + str(zoom) + "-" + str(tile[0]) + "-" + str(tile[1]) + ".jpg"
     Image.fromarray(workingBuffer).save(fileName)
 
 
-# date = datetime.datetime.today() - 100
+import subprocess
+# Copy data to make the video
+def copyData(date):
+
+  for i in xrange(365):
+    fileName = os.path.join(OUTPUTDIR, "output") + "-" + dayDeltaBack(date, i) +".jpg"
+    bashCommand = "cp " + fileName + " " + os.path.join(OUTPUTDIR, "video")
+    process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+    output = process.communicate()[0]
+    print output
+
 date = datetime.datetime(year=2013, month=01, day=01)
+# date = datetime.datetime.today() - 100
 # The maximum number of days used to get the cloud free images
 
+# getData((1,1), date, 2)
 
-getData((1,1), date, 2)
+copyData(date)
+
+

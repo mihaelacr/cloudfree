@@ -20,8 +20,8 @@ def dayDeltaBack(day, delta):
 
 def getPhoto(day, zoom, tile):
   zoom = str(zoom)
+  fileName = os.path.join(DATADIR, day) +"-" + zoom + "-" + str(tile[0]) + str(tile[1]) + " photo.jpg"
   tile = "/" + str(tile[0]) + "/" + str(tile[1])
-  fileName = os.path.join(DATADIR, day) +"-photo.jpg"
 
   if not os.path.isfile(fileName):
     content = urllib.urlopen("http://map1.vis.earthdata.nasa.gov/wmts-geo/MODIS_Terra_CorrectedReflectance_TrueColor/default/" + day + "/EPSG4326_250m/"+ zoom + tile + ".jpg").read()
@@ -32,8 +32,8 @@ def getPhoto(day, zoom, tile):
 
 def getCloud(day, zoom, tile):
   zoom = str(zoom)
+  fileName = os.path.join(DATADIR, day) +"-" + zoom + "-" + str(tile[0]) + str(tile[1]) + " photo.jpg"
   tile = "/" + str(tile[0]) + "/" + str(tile[1])
-  fileName = os.path.join(DATADIR, day) +"-cloud.png"
 
   if not os.path.isfile(fileName):
     content = urllib.urlopen("http://map1.vis.earthdata.nasa.gov/wmts-geo/MODIS_Terra_Cloud_Top_Temp_Day/default/" + day + "/EPSG4326_2km/"+ zoom + tile + ".png").read()
@@ -44,8 +44,8 @@ def getCloud(day, zoom, tile):
 
 def getNoData(day, zoom, tile):
   zoom = str(zoom)
+  fileName = os.path.join(DATADIR, day) +"-" + zoom + "-" + str(tile[0]) + str(tile[1]) + " photo.jpg"
   tile = "/" + str(tile[0]) + "/" + str(tile[1])
-  fileName = os.path.join(DATADIR, day) +"-nodata.png"
 
   if not os.path.isfile(fileName):
     content = urllib.urlopen("http://map1.vis.earthdata.nasa.gov/wmts-geo/MODIS_Terra_Data_No_Data/default/" + day + "/EPSG4326_250m/"+ zoom + tile + ".png").read()

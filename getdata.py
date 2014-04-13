@@ -24,8 +24,7 @@ def getPhoto(day, zoom, tile):
   fileName = os.path.join(DATADIR, day) +"-photo.jpg"
 
   if not os.path.isfile(fileName):
-    content = urllib.urlopen("http://map1.vis.earthdata.nasa.gov/wmts-geo/MODIS_Terra_CorrectedReflectance_TrueColor/default/" + day + "/EPSG4326_250m/"+
-      + zoom + tile + ".jpg").read()
+    content = urllib.urlopen("http://map1.vis.earthdata.nasa.gov/wmts-geo/MODIS_Terra_CorrectedReflectance_TrueColor/default/" + day + "/EPSG4326_250m/"+ + zoom + tile + ".jpg").read()
     with open(fileName, "wb") as f:
       f.write(content)
 
@@ -37,8 +36,7 @@ def getCloud(day, zoom, tile):
   fileName = os.path.join(DATADIR, day) +"-cloud.png"
 
   if not os.path.isfile(fileName):
-    content = urllib.urlopen("http://map1.vis.earthdata.nasa.gov/wmts-geo/MODIS_Terra_Cloud_Top_Temp_Day/default/" + day + "/EPSG4326_2km/"+
-      zoom + tile + ".png").read()
+    content = urllib.urlopen("http://map1.vis.earthdata.nasa.gov/wmts-geo/MODIS_Terra_Cloud_Top_Temp_Day/default/" + day + "/EPSG4326_2km/"+ zoom + tile + ".png").read()
     with open(fileName, "wb") as f:
       f.write(content)
 
@@ -50,8 +48,7 @@ def getNoData(day, zoom, tile):
   fileName = os.path.join(DATADIR, day) +"-nodata.png"
 
   if not os.path.isfile(fileName):
-    content = urllib.urlopen("http://map1.vis.earthdata.nasa.gov/wmts-geo/MODIS_Terra_Data_No_Data/default/" + day + "/EPSG4326_250m/"+
-      zoom + tile + ".png").read()
+    content = urllib.urlopen("http://map1.vis.earthdata.nasa.gov/wmts-geo/MODIS_Terra_Data_No_Data/default/" + day + "/EPSG4326_250m/"+ zoom + tile + ".png").read()
     with open(fileName, "wb") as f:
       f.write(content)
 

@@ -8,11 +8,17 @@ import urllib
 
 import numpy as np
 import datetime
+import os
 import os.path
 
 DATADIR = "data"
-MAXDAYS = 365
+OUTPUTDIR = "output"
+MAXDAYS = 10
 
+if not os.path.exists(DATADIR):
+  os.makedirs(DATADIR)
+if not os.path.exists(OUTPUTDIR):
+  os.makedirs(OUTPUTDIR)
 
 def dayDeltaBack(day, delta):
   return (day + datetime.timedelta(days=delta)).strftime("%Y-%m-%d")
@@ -144,7 +150,7 @@ def getData(tile, date, zoom):
     # print type(workingBuffer[0,0,0])
 
     # save output
-    fileName = "output/output-"+dayDeltaBack(date, i) + ".jpg"
+    fileName = OUTPUTDIR + "/output-"+dayDeltaBack(date, i) + ".jpg"
     Image.fromarray(workingBuffer).save(fileName)
 
 

@@ -157,7 +157,12 @@ def getData(tile, date, zoom):
 
 import subprocess
 # Copy data to make the video
+
+# This will not work if you do not pass the zoom index and how many days to take
 def copyData(date):
+
+  if not os.path.exists('output/video'):
+    os.makedirs('output/video')
 
   for i in xrange(365):
     fileName = os.path.join(OUTPUTDIR, "output") + "-" + dayDeltaBack(date, i) +".jpg"
@@ -166,12 +171,58 @@ def copyData(date):
     output = process.communicate()[0]
     print output
 
+def copyDataFull(date, zoom, tile):
+  import shutil
+  if os.path.exists('output/video'):
+    shutil.rmtree('output/video')
+
+  os.makedirs('output/video')
+
+  for i in xrange(MAXDAYS):
+    fileName = os.path.join(OUTPUTDIR, "output") + "-" + dayDeltaBack(date, i) + "-" + str(zoom) + "-" + str(tile[0]) + "-" + str(tile[1]) + ".jpg"
+    bashCommand = "cp " + fileName + " " + os.path.join(OUTPUTDIR, "video")
+    process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+    output = process.communicate()[0]
+    print output
+
+
+def makeVideoAfterCopy():
+  import shutil
+  if os.path.exists('gen'):
+    shutil.rmtree('gen')
+  if not os.path.exists('gen'):
+    os.makedirs('gen')
+  symLinksCommand = "x=0; for i in $(find output/video -name '*.jpg' | sort); do counter=$(printf %04d $x); (cd gen && ln -s ../\"$i\" \"$counter\".jpg); x=$(($x+1)); done"
+  process = subprocess.Popen(["bash", "-c", symLinksCommand])
+  output = process.communicate()[0]
+  print output
+
+  if os.path.exists('test.mp4'):
+    os.remove('test.mp4')
+  makeVideoCommand = "avconv -r 3 -i gen/%04d.jpg -b:v 1000k test.mp4"
+  print makeVideoCommand
+  process = subprocess.Popen(makeVideoCommand.split())
+  output = process.communicate()[0]
+  print output
+  os.chdir('..')
+
+
+
+def makeVideo(date, zoom, tile):
+  getData(tile, date, zoom)
+  copyDataFull(date, zoom, tile)
+  makeVideoAfterCopy()
+
 date = datetime.datetime(year=2013, month=01, day=01)
 # date = datetime.datetime.today() - 100
 # The maximum number of days used to get the cloud free images
 
 # getData((1,1), date, 2)
 
-copyData(date)
+# copyData(date)
+# makeVideo()
 
+zoom = 2
+tile = (1,1)
 
+makeVideo(date, zoom, tile)
